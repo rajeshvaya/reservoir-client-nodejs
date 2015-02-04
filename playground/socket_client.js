@@ -2,7 +2,7 @@ var net = require('net');
 
 var client = net.Socket();
 client.connect('3142','localhost',function(){
-    console.log("\nConnected to localhost:3142");
+    console.log("\nConnected to reservoir server");
 });
 
 client.on("data", function(data){
