@@ -35,12 +35,15 @@ module. exports = {
     },
     _process: function(data) {
         var response = JSON.parse(data.toString());
-        var handler = this._handlers[response.incoming_message];
-        if (handler) {
-            if (response.message) {
-                handler(null, response.message);
-            } else {
-                handler(new Error(response.error), null);
+        if(response.data){
+            for(i=0; i<response.data.length; i++){
+                element = response.data[i];
+                var handler = this._handlers[element.key];
+                if (handler) {
+                    if (element.data) {
+                        handler(null, response.message);
+                    }
+                }
             }
         }
         delete this._handlers[response.incoming_message];
