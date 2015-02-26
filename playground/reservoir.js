@@ -18,20 +18,38 @@ module. exports = {
         return this;
     },
     get: function(key, then) {
+        var batch_string = JSON.stringify({
+            key: key
+        });
+        return this.send(key, batch_string);
+    },
+    set: function(data, then) {
         var $this = this;
-        $this.client.write(key, function() {
+        var batch_string = JSON.stringify({
+            key: data['key'],
+            data: data['value'],
+            expiry: data['expiry'],
+        });
+        return this.send(data['key'], batch_string);
+    },
+    delete: function(key, then) {
+        var batch_string = JSON.stringify({
+            key: key
+        });
+        return this.send(key, batch_string);
+    },
+    send: function(key, type, batch_string){
+        var $this = this;
+        var data_string =  type + " " + batch_string;
+
+        $this.client.write(data_string, function() {
             $this._handle(key, then);
         });
         return this;
     },
     _handlers: {},
-    _commands: ['GET', 'SET', 'DEL'],
     _handle: function(key, handler) {
-        //remove commands from the key, because server doesn't return them (you can check here if its a valid command)
-        var keyParts = key.split(' ');
-        keyParts.shift();
-
-        this._handlers[keyParts] = handler;
+        this._handlers[key] = handler;
     },
     _process: function(data) {
         var response = JSON.parse(data.toString());
@@ -41,11 +59,11 @@ module. exports = {
                 var handler = this._handlers[element.key];
                 if (handler) {
                     if (element.data) {
-                        handler(null, response.message);
+                        handler(null, element.key);
                     }
                 }
+                delete this._handlers[element.key];
             }
         }
-        delete this._handlers[response.incoming_message];
     }
 };

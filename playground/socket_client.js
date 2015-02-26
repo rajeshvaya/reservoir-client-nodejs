@@ -1,3 +1,7 @@
+/**
+ * TODO: NEED TO REWRITE THIS AS WE ARE GOING TO USE BATCH AND JSON ON SERVER SIDE WITH MORE FLEXIBILTY
+ */
+
 var net = require('net');
 
 var client = net.Socket();
