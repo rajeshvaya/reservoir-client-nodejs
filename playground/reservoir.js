@@ -21,7 +21,7 @@ module. exports = {
         var batch_string = JSON.stringify({
             key: key
         });
-        return this.send(key, batch_string);
+        return this.send('GET', key, batch_string);
     },
     set: function(data, then) {
         var $this = this;
@@ -30,15 +30,39 @@ module. exports = {
             data: data['value'],
             expiry: data['expiry'],
         });
-        return this.send(data['key'], batch_string);
+        return this.send('SET', data['key'], batch_string);
     },
     delete: function(key, then) {
         var batch_string = JSON.stringify({
             key: key
         });
-        return this.send(key, batch_string);
+        return this.send('DEL', key, batch_string);
     },
-    send: function(key, type, batch_string){
+    bucket: function(bucket, then) {
+        var batch_string = JSON.stringify({
+            batch: batch
+        });
+        return this.send('BKT', bucket, batch_string);
+    },
+    tpl: function(data, then) {
+        var $this = this;
+        var batch_string = JSON.stringify({
+            key: data['key'],
+            data: data['value'],
+            expiry: data['expiry'],
+        });
+        return this.send('TPL', data['key'], batch_string);
+    },
+    ota: function(data, then) {
+        var $this = this;
+        var batch_string = JSON.stringify({
+            key: data['key'],
+            data: data['value'],
+            expiry: data['expiry'],
+        });
+        return this.send('OTA', data['key'], batch_string);
+    },
+    send: function(type, key, batch_string){
         var $this = this;
         var data_string =  type + " " + batch_string;
 
