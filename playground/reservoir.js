@@ -72,7 +72,7 @@ module. exports = {
         var batch_string = JSON.stringify({
             key: key
         });
-        return this.send('ICR', key, batch_string);
+        return this.send('ICR', key, batch_string, then);
     },
 
     send: function(type, key, batch_string, then){
