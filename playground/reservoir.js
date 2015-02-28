@@ -21,7 +21,7 @@ module. exports = {
         var batch_string = JSON.stringify({
             key: key
         });
-        return this.send('GET', key, batch_string);
+        return this.send('GET', key, batch_string, then);
     },
     set: function(data, then) {
         var $this = this;
@@ -30,19 +30,19 @@ module. exports = {
             data: data['value'],
             expiry: data['expiry'],
         });
-        return this.send('SET', data['key'], batch_string);
+        return this.send('SET', data['key'], batch_string, then);
     },
     delete: function(key, then) {
         var batch_string = JSON.stringify({
             key: key
         });
-        return this.send('DEL', key, batch_string);
+        return this.send('DEL', key, batch_string, then);
     },
     bucket: function(bucket, then) {
         var batch_string = JSON.stringify({
             batch: batch
         });
-        return this.send('BKT', bucket, batch_string);
+        return this.send('BKT', bucket, batch_string, then);
     },
     tpl: function(data, then) {
         var $this = this;
@@ -51,7 +51,7 @@ module. exports = {
             data: data['value'],
             expiry: data['expiry'],
         });
-        return this.send('TPL', data['key'], batch_string);
+        return this.send('TPL', data['key'], batch_string, then);
     },
     ota: function(data, then) {
         var $this = this;
@@ -60,9 +60,22 @@ module. exports = {
             data: data['value'],
             expiry: data['expiry'],
         });
-        return this.send('OTA', data['key'], batch_string);
+        return this.send('OTA', data['key'], batch_string), then;
     },
-    send: function(type, key, batch_string){
+    icr: function(key, then) {
+        var batch_string = JSON.stringify({
+            key: key
+        });
+        return this.send('ICR', key, batch_string, then);
+    },
+    dcr: function(key, then) {
+        var batch_string = JSON.stringify({
+            key: key
+        });
+        return this.send('ICR', key, batch_string);
+    },
+
+    send: function(type, key, batch_string, then){
         var $this = this;
         var data_string =  type + " " + batch_string;
 
