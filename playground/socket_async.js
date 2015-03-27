@@ -1,8 +1,8 @@
 var reservoir = require('./reservoir');
 var onConnect = function() {
     console.log("\nConnected.");
-    reservoir.get('GET pk_movie', function(err, response) {
+    reservoir.get('pk_movie', function(err, response) {
         console.log(response);
     });
 };
-reservoir.connect('3142', 'aswat-office.aswtel.com', onConnect);
+reservoir.connect('3142', 'localhost', onConnect);
