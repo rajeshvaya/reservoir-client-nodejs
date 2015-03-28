@@ -72,20 +72,37 @@ module. exports = {
         var batch_string = JSON.stringify([{
             key: key
         }]);
-        return this.send('ICR', key, batch_string, then);
+        return this.send('DCR', key, batch_string, then);
     },
 
     send: function(type, key, batch_string, then){
         var $this = this;
         var data_string =  type + " " + batch_string;
-        $this.client.write(data_string, function() {
-            $this._handle(key, then);
+
+        $this._add_to_queue(function(){
+            $this.client.write(data_string, function() {
+                $this._handle(key, then);
+            });
         });
+        
         return this;
     },
     _handlers: {},
     _handle: function(key, handler) {
         this._handlers[key] = handler;
+    },
+    _queue: [],
+    _add_to_queue: function(f){
+        this._queue.push(f);
+        if(this._queue.length == 1)
+            this._next_in_queue();
+    },
+    _next_in_queue: function(){
+        if(this._queue.length){
+            f = this._queue[0];
+            f();
+        }
+        return;
     },
     _process: function(data) {
         var response = JSON.parse(data.toString());
@@ -95,12 +112,16 @@ module. exports = {
                 element = r[i];
                 var handler = this._handlers[element.key];
                 if (handler) {
-                    if (element.data) {
-                        handler(null, element.key);
+                    if(element.key){
+                        handler(null, element.data);
                     }
                 }
                 delete this._handlers[element.key];
             }
         }
+        // process the next item in the queue
+        this._queue.shift();
+        this._next_in_queue();
     }
+
 };
