@@ -94,7 +94,7 @@ module. exports = {
     _queue: [],
     _add_to_queue: function(f){
         this._queue.push(f);
-        if(this._queue.length == 1)
+        if(this._queue.length === 1)
             this._next_in_queue();
     },
     _next_in_queue: function(){

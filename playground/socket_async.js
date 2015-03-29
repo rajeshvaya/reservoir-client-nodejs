@@ -20,5 +20,17 @@ var onConnect = function() {
         console.log(response);
     });
 
+    // ICR
+    reservoir.get('pk_movie_votes', function(err, response){
+		console.log(response);
+    });
+
+    console.log("==> Going to increment the cache item");
+    reservoir.icr('pk_movie_votes', function(err, response){
+		console.log(response);
+	}).get('pk_movie_votes', function(err, response){
+		console.log(response);
+    });
+    
 };
 reservoir.connect('3142', 'localhost', onConnect);
