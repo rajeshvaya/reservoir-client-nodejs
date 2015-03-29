@@ -11,6 +11,7 @@ var onConnect = function() {
     });
     
     // SET
+    
     set_data = {
         key: "pk_movie_votes",
         value: "1000",
@@ -25,12 +26,19 @@ var onConnect = function() {
 		console.log(response);
     });
 
-    console.log("==> Going to increment the cache item");
     reservoir.icr('pk_movie_votes', function(err, response){
 		console.log(response);
 	}).get('pk_movie_votes', function(err, response){
 		console.log(response);
     });
-    
+
+    // DELETE
+    reservoir.delete("pk_movie_votes", function(err, response){
+		console.log(response);
+	}).get('pk_movie_votes', function(err, response){
+		console.log(response);
+    });
+
+
 };
 reservoir.connect('3142', 'localhost', onConnect);
