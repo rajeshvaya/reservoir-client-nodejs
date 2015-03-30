@@ -11,7 +11,6 @@ var onConnect = function() {
     });
     
     // SET
-    
     set_data = {
         key: "pk_movie_votes",
         value: "1000",

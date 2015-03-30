@@ -23,6 +23,17 @@ module. exports = {
         }]);
         return this.send('GET', key, batch_string, then);
     },
+
+    get_batch: function(list, then){
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(element, index, array){
+            batch.push(element);
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('GET', list, batch_string, then);
+    },
+
     set: function(data, then) {
         var $this = this;
         var batch_string = JSON.stringify([{
@@ -32,12 +43,39 @@ module. exports = {
         }]);
         return this.send('SET', data['key'], batch_string, then);
     },
+
+    set_batch: function(list, then) {
+        var $this = this;
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(data, index, array){
+            batch.push({
+                key: data['key'],
+                data: data['value'],
+                expiry: data['expiry']
+            });
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('SET', list, batch_string, then);
+    },
+
     delete: function(key, then) {
         var batch_string = JSON.stringify([{
             key: key
         }]);
         return this.send('DEL', key, batch_string, then);
     },
+
+    delete_batch: function(list, then){
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(element, index, array){
+            batch.push(element);
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('DEL', list, batch_string, then);
+    },
+
     bucket: function(bucket, then) {
         var batch_string = JSON.stringify([{
             batch: batch
@@ -68,11 +106,30 @@ module. exports = {
         }]);
         return this.send('ICR', key, batch_string, then);
     },
+    icr_batch: function(list, then){
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(element, index, array){
+            batch.push(element);
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('ICR', list, batch_string, then);
+    },
+
     dcr: function(key, then) {
         var batch_string = JSON.stringify([{
             key: key
         }]);
         return this.send('DCR', key, batch_string, then);
+    },
+    dcr_batch: function(list, then){
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(element, index, array){
+            batch.push(element);
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('DCR', list, batch_string, then);
     },
 
     send: function(type, key, batch_string, then){
