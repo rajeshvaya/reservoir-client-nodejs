@@ -28,7 +28,7 @@ module. exports = {
         var batch = [];
         var batch_string = '';
         list.forEach(function(element, index, array){
-            batch.push(element);
+            batch.push({key: element});
         });
         batch_string = JSON.stringify(batch);
         return this.send('GET', list, batch_string, then);
@@ -70,7 +70,7 @@ module. exports = {
         var batch = [];
         var batch_string = '';
         list.forEach(function(element, index, array){
-            batch.push(element);
+            batch.push({key: element});
         });
         batch_string = JSON.stringify(batch);
         return this.send('DEL', list, batch_string, then);
@@ -82,6 +82,7 @@ module. exports = {
         }]);
         return this.send('BKT', bucket, batch_string, then);
     },
+
     tpl: function(data, then) {
         var $this = this;
         var batch_string = JSON.stringify([{
@@ -91,6 +92,22 @@ module. exports = {
         }]);
         return this.send('TPL', data['key'], batch_string, then);
     },
+
+    tpl_batch: function(list, then) {
+        var $this = this;
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(data, index, array){
+            batch.push({
+                key: data['key'],
+                data: data['value'],
+                expiry: data['expiry']
+            });
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('TPL', list, batch_string, then);
+    },
+
     ota: function(data, then) {
         var $this = this;
         var batch_string = JSON.stringify([{
@@ -100,6 +117,22 @@ module. exports = {
         }]);
         return this.send('OTA', data['key'], batch_string), then;
     },
+
+    ota_batch: function(list, then) {
+        var $this = this;
+        var batch = [];
+        var batch_string = '';
+        list.forEach(function(data, index, array){
+            batch.push({
+                key: data['key'],
+                data: data['value'],
+                expiry: data['expiry']
+            });
+        });
+        batch_string = JSON.stringify(batch);
+        return this.send('OTA', list, batch_string, then);
+    },
+
     icr: function(key, then) {
         var batch_string = JSON.stringify([{
             key: key
@@ -110,7 +143,7 @@ module. exports = {
         var batch = [];
         var batch_string = '';
         list.forEach(function(element, index, array){
-            batch.push(element);
+            batch.push({key: element});
         });
         batch_string = JSON.stringify(batch);
         return this.send('ICR', list, batch_string, then);
@@ -122,11 +155,12 @@ module. exports = {
         }]);
         return this.send('DCR', key, batch_string, then);
     },
+
     dcr_batch: function(list, then){
         var batch = [];
         var batch_string = '';
         list.forEach(function(element, index, array){
-            batch.push(element);
+            batch.push({key: element});
         });
         batch_string = JSON.stringify(batch);
         return this.send('DCR', list, batch_string, then);
@@ -136,9 +170,10 @@ module. exports = {
         var $this = this;
         var data_string =  type + " " + batch_string;
 
+        var keymap = key instanceof String ? [key] : key;
         $this._add_to_queue(function(){
             $this.client.write(data_string, function() {
-                $this._handle(key, then);
+                $this._handle(keymap, then);
             });
         });
         
@@ -165,19 +200,22 @@ module. exports = {
         var response = JSON.parse(data.toString());
         if(response.data){
             r = JSON.parse(response.data);
-            for(i=0; i<r.length; i++){
-                element = r[i];
-                var handler = this._handlers[element.key];
-                if (handler) {
-                    if(element.key){
-                        handler(null, element.data);
-                    }
-                }
-                delete this._handlers[element.key];
+            keymap = [];
+            r.forEach(function(element, index, array){
+                keymap.push(element.key);
+            });
+
+            var handler = this._handlers[keymap];
+            if(typeof(handler) == 'function'){
+                if(r.length === 1)
+                    handler(null, r[0].data);
+                else
+                    handler(null, r);
             }
+            delete this._handlers[keymap];
         }
         // process the next item in the queue
-        this._queue.shift();
+        f = this._queue.shift();
         this._next_in_queue();
     }
 

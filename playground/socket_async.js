@@ -8,6 +8,9 @@ var onConnect = function() {
     })
     .get('pk_actor', function(err, response) {
         console.log(response);
+    })
+    .get_batch(['pk_actor', 'pk_movie'], function(err, response) {
+        console.log(response);
     });
     
     // SET
